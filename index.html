@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>1908：綠空時光環線・90分鐘實境解謎</title>
+  <style>
+    :root {
+      --bg-dark: #1c1917;
+      --card-bg: #292524;
+      --rust-primary: #b45309;
+      --rust-light: #d97706;
+      --gold-accent: #fbbf24;
+      --green-rail: #15803d;
+      --green-light: #22c55e;
+      --text-main: #f5f5f4;
+      --text-muted: #a8a29e;
+      --border-color: #44403c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 40px;
+      background-image: radial-gradient(#292524 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* 頂部儀表板 */
+    header {
+      background: linear-gradient(135deg, #292524 0%, #1c1917 100%);
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--rust-light);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      background: rgba(217, 119, 6, 0.2);
+      color: var(--gold-accent);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .timer {
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: var(--green-light);
+      background: rgba(21, 128, 61, 0.15);
+      padding: 2px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* 進度條 */
+    .progress-wrapper {
+      background: #1c1917;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--rust-light), var(--gold-accent));
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* 關卡導覽點點 */
+    .stage-nav {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .stage-dot {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .stage-dot.active {
+      border-color: var(--gold-accent);
+      color: var(--gold-accent);
+      background: rgba(251, 191, 36, 0.12);
+      transform: scale(1.06);
+    }
+
+    .stage-dot.solved {
+      background: var(--green-rail);
+      border-color: var(--green-light);
+      color: #fff;
+    }
+
+    /* 動線提示橫幅 */
+    .route-banner {
+      background: rgba(21, 128, 61, 0.14);
+      border-left: 4px solid var(--green-light);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+
+    .route-banner strong {
+      color: var(--green-light);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* 主題卡片 */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .q-num {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold-accent);
+    }
+
+    .q-stars {
+      font-size: 0.8rem;
+      color: #f59e0b;
+    }
+
+    .q-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .location-box {
+      background: #1c1917;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      color: #d6d3d1;
+      margin-bottom: 14px;
+    }
+
+    .location-box span {
+      color: var(--gold-accent);
+      font-weight: 700;
+    }
+
+    .q-desc {
+      font-size: 0.98rem;
+      color: #e7e5e4;
+      margin-bottom: 18px;
+      white-space: pre-line;
+    }
+
+    /* 輸入區 */
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: #1c1917;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--gold-accent);
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--rust-light), var(--rust-primary));
+      color: #fff;
+      min-width: 96px;
+    }
+
+    .btn-hint {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      width: 100%;
+      padding: 9px;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .hint-box {
+      display: none;
+      margin-top: 10px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px dashed rgba(251, 191, 36, 0.4);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.88rem;
+      color: #fde68a;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      display: none;
+    }
+
+    .feedback.error {
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      color: #fca5a5;
+    }
+
+    .feedback.success {
+      background: rgba(21, 128, 61, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #bbf7d0;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 18px;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      flex: 1;
+      background: #1c1917;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* 完賽紀念車票 */
+    #victory-screen {
+      display: none;
+    }
+
+    .ticket {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #1c1917;
+      border-radius: 16px;
+      padding: 22px;
+      border: 2px dashed #92400e;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    .ticket-header {
+      border-bottom: 2px solid #92400e;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ticket-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #78350f;
+    }
+
+    .ticket-route {
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-align: center;
+      margin: 14px 0;
+      letter-spacing: 0.08em;
+      color: #451a03;
+    }
+
+    .ticket-meta {
+      background: rgba(255,255,255,0.6);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+    }
+
+    .ticket-meta p {
+      margin-bottom: 4px;
+    }
+
+    .btn-reset {
+      background: #292524;
+      color: #fff;
+      width: 100%;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-row">
+        <span class="tag">TAIWAN CONNECTION 1908</span>
+        <span class="timer" id="timer">00:00</span>
+      </div>
+      <h1>綠空時光環線・實境解謎</h1>
+      <p class="subtitle">臺中火車站出發 $\rightarrow$ 高架去程 $\rightarrow$ 地面回程（約90分鐘）</p>
+      <div class="progress-wrapper">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-text">
+        <span id="progress-label">完成進度：0 / 16 關</span>
+        <span id="zone-label">區域 A｜車站起點</span>
+      </div>
+    </header>
+
+    <!-- 16關快速跳轉格 -->
+    <div class="stage-nav" id="stage-nav"></div>
+
+    <!-- 動線階段提示 -->
+    <div class="route-banner" id="route-banner">
+      <strong>📍 當前動線指引</strong>
+      <span id="route-text">請前往臺中火車站南側綠空鐵道北端入口「全區地圖」立牌前。</span>
+    </div>
+
+    <!-- 題目主卡片 -->
+    <div class="card" id="quiz-card">
+      <div class="q-header">
+        <span class="q-num" id="q-num">STAGE 01 / 16</span>
+        <span class="q-stars" id="q-stars">難度：★★☆</span>
+      </div>
+      <h2 class="q-title" id="q-title">載入中...</h2>
+      <div class="location-box" id="q-location"><span>📌 現地線索點：</span>載入中...</div>
+      <div class="q-desc" id="q-desc"></div>
+
+      <div class="input-group">
+        <input type="text" id="answer-input" placeholder="請輸入通關密碼..." autocomplete="off" />
+        <button class="btn-submit" id="submit-btn" onclick="checkAnswer()">解鎖</button>
+      </div>
+
+      <button class="btn-hint" onclick="toggleHint()">💡 需要現場線索提示？點此展開</button>
+      <div class="hint-box" id="hint-box"></div>
+      <div class="feedback" id="feedback"></div>
+
+      <div class="nav-buttons">
+        <button class="btn-nav" id="prev-btn" onclick="changeStage(-1)">← 上一關</button>
+        <button class="btn-nav" id="next-btn" onclick="changeStage(1)">下一關 →</button>
+      </div>
+    </div>
+
+    <!-- 全部通關電子車票 -->
+    <div id="victory-screen">
+      <div class="ticket">
+        <div class="ticket-header">
+          <span class="ticket-title">🚂 綠空百年時光紀念車票</span>
+          <span style="font-weight:800; color:#92400e;">NO. 1908-2026</span>
+        </div>
+        <p style="font-size:0.88rem; color:#78350f;">恭喜完成臺中綠空鐵道 O 型環狀實境解謎全數 16 道關卡！</p>
+        <div class="ticket-route">臺中車站 ⇄ 民生綠橋</div>
+        <div class="ticket-meta">
+          <p><strong>任務路線：</strong>高架文學鐵軌廊道 $\rightarrow$ 地面水岸百年遺構</p>
+          <p><strong>總計耗時：</strong><span id="final-time">--:--</span></p>
+          <p><strong>通關認證：</strong>全區 16 關密碼全數解鎖</p>
+        </div>
+        <p style="font-size:0.8rem; color:#92400e; text-align:center;">請出示本畫面給領隊／關主核銷領取完賽獎勵！</p>
+      </div>
+      <button class="btn-reset" onclick="resetGame()">重新開始新一輪挑戰</button>
+    </div>
+  </div>
+
+  <script>
+    const stages = [
+      {
+        id: 1,
+        zone: "區域 A｜車站起點",
+        route: "【出發】臺中火車站南側綠空鐵道北端入口「全區地圖」立牌前。",
+        stars: "★★☆",
+        title: "第 1 題｜起點的年份密碼",
+        location: "臺中火車站南側「全區地圖」解說牌",
+        desc: "站在一切旅程的起點，抬頭望向刻著「綠空」二字的棕色立牌。標題中隱藏著縱貫線開通的四位數年份；同時，將視線移至橘色路線圖最頂端「臺中車站」旁的指北針箭頭。\n\n請問：標題中的「四位數年份」，加上「指北針尖端所指方位國字筆畫數」，總和是多少？",
+        answers: ["1913"],
+        hint: "標題年份為 1908，指北針指向「北」（共 5 畫），請將兩者相加。",
+        story: "解鎖成功！1908 年臺灣縱貫鐵路全線通車，臺中車站正式成為中部交通心臟。"
+      },
+      {
+        id: 2,
+        zone: "區域 A｜車站起點",
+        route: "【出發】繼續留在「全區地圖」立牌前，準備登上高架廊道往南出發。",
+        stars: "★★★",
+        title: "第 2 題｜地圖上的路線序列",
+        location: "全區地圖立牌・橘色路線節點",
+        desc: "在全區地圖上找出以下四個地點，並依照「由北到南（從臺中車站出發的先後順序）」排列代碼組成四位數密碼：\n\n[ 3 ] 綠川橋台（LYU-CHUAN ABUTMENT）\n[ 7 ] 時空之門（TIME GATE）\n[ 1 ] 飛天草坪（MULTIFUNCTIONAL FLYING LAWN）\n[ 9 ] 地景之初（PRIMARY LANDSCAPE）",
+        answers: ["7931"],
+        hint: "由地圖最上方「臺中車站」往下看，最先遇到的是「時空之門 (7)」，最後才是「飛天草坪 (1)」。",
+        story: "路線校準完成！現在請由北端階梯或電梯「登上高架廊道」，一路向南漫步！"
+      },
+      {
+        id: 3,
+        zone: "區域 E｜高架文學涼亭",
+        route: "【去程・高架層往南】沿高架步道往前走，抵達第一座耐候鋼文學涼亭。",
+        stars: "★★★",
+        title: "第 3 題｜尋找四字方印的閱讀密碼",
+        location: "耐候鋼詩文涼亭・外側牆面方印招牌",
+        desc: "繞到涼亭外側尋找四個被框在正方形裡的金屬立體字。當你從左往右讀時會發現字序是倒過來的——因為百年前這家臺中指標性老書局掛起匾額時，遵循的是傳統中文「由右至左」的古法規矩。\n\n請讀出這家書局的名字，並聯想當年親自為它題寫匾額的霧峰林家先賢（臺灣文化協會創辦人）。請輸入這位先賢的三個字全名！",
+        answers: ["林獻堂"],
+        hint: "由右至左讀出為「中央書局」，題字者是霧峰萊園主人「林獻堂」。",
+        story: "沒錯！1927 年創立的中央書局，是當年臺中知識分子與文化協會最重要的思想搖籃。"
+      },
+      {
+        id: 4,
+        zone: "區域 E｜高架文學涼亭",
+        route: "【去程・高架層往南】繼續往前走至下一座耐候鋼藝術涼亭。",
+        stars: "★★☆",
+        title: "第 4 題｜尋找「風吹」背後的科學密碼",
+        location: "林之助書法涼亭・轉角柱面白色墨寶",
+        desc: "在懸空石椅轉角的柱面上，尋找一幅以豪邁白色筆觸書寫的書法作品（左下角蓋有「林之助」印章），寫著「明天有明天的＿＿」。\n\n觀察最後兩個字後，請聯想在氣象學中，這種空氣水平流動的現象，主要是因為地球表面兩地之間的什麼物理量不同（存在「＿＿差」）所引起的？（兩個中文字）",
+        answers: ["氣壓", "氣壓差"],
+        hint: "書法最後兩字為「風吹」；風的形成是因為兩地之間有「氣壓」高低差異。",
+        story: "豁達又充滿科學精神！明天有明天的風吹，繼續迎著微風往南前進吧！"
+      },
+      {
+        id: 5,
+        zone: "區域 E｜高架文學涼亭",
+        route: "【去程・高架層往南】走進這座藝術涼亭內部閱讀《林之助話語》。",
+        stars: "★★★",
+        title: "第 5 題｜尋找膠彩畫之父的故居路標",
+        location: "藝術涼亭內壁・《林之助話語》壁面",
+        desc: "林之助先生被尊稱為「臺灣膠彩畫之父」。他當年任教於臺中師範學校時，宿舍與如今保存完整的「林之助紀念館」，就位在臺中市西區一條緊鄰河川的道路上（與綠川、梅川、麻園頭溪並列為臺中市區四大河川）。\n\n請問紀念館位於「＿＿西路二段」？（請輸入前兩個中文字）",
+        answers: ["柳川"],
+        hint: "臺中市區四大河川為綠川、梅川、麻園頭溪，以及「柳川」。",
+        story: "答對了！位於柳川西路二段的林之助紀念館，至今仍保留著優雅的日式木造畫室。"
+      },
+      {
+        id: 6,
+        zone: "區域 F-1｜高架舊鐵軌區",
+        route: "【去程・高架層往南】離開涼亭繼續向南，來到地面保留舊鋼軌與石枕木的路段。",
+        stars: "★★★",
+        title: "第 6 題｜會「呼吸」的石頭床鋪",
+        location: "高架舊鐵軌保留段・枕木間碎石層",
+        desc: "老站長說：「少年仔，低頭看看腳下石枕木之間那些稜角分明的灰白色碎石頭！火車幾十噸重壓過去，全靠這些石頭互相卡緊來分散重量、排水防震。」\n\n在鐵道工程專業術語中，這層鋪在軌枕下方與周圍的碎石層，被稱為「＿＿」（兩個中文字）。請輸入這個鐵道專有名詞！",
+        answers: ["道碴", "道渣"],
+        hint: "第一個字是道路的「道」，第二個字讀音同「茶」（石部，碴）。",
+        story: "內行人的回答！「道碴」能吸收列車震動並快速排水，是鐵道安全無聲的功臣。"
+      },
+      {
+        id: 7,
+        zone: "區域 F-1｜高架舊鐵軌區",
+        route: "【去程・高架層往南】低頭沿著石枕木往南尋找刻有圓形圖案的枕木。",
+        stars: "★★☆",
+        title: "第 7 題｜沒有它火車絕對不能開！",
+        location: "刻有圓形電氣路牌圖案的石枕木",
+        desc: "在還沒有電腦自動號誌的年代，單線鐵路上最怕火車對撞，站長必須親手將「電氣路牌」交給司機員才能發車。\n\n請找到刻有圓形路牌圖案的這塊石枕木，讀出第一行中文說明「＿＿＿＿＿＿的憑證」，將最前面這六個中文字完整輸入作為通關密語！",
+        answers: ["通行閉塞區間"],
+        hint: "第一行字共九個字，前六個字為「通行閉塞區間」。",
+        story: "安全確認！確保每段區間僅有一班列車通過，正是百年鐵道零事故的鐵律。"
+      },
+      {
+        id: 8,
+        zone: "區域 F-1｜高架舊鐵軌區",
+        route: "【去程・高架層往南】觀察「大慶—台中—豐原」至「光華號維修機廠」枕木排列。",
+        stars: "★★☆",
+        title: "第 8 題｜隱藏在空白枕木之間的節奏",
+        location: "舊鐵軌石枕木序列段",
+        desc: "設計師刻意讓刻有故事的枕木與素面空白枕木交替出現。請數一數：\n\n1. 從「1908-2016 大慶—台中—豐原」到「通行閉塞區間」之間隔了幾根空白枕木（A）？\n2. 從「通行閉塞區間」到「1969 光華號維修機廠」之間又隔了幾根空白枕木（B）？\n\n請將這兩個數字並排組成一組兩位數密碼（AB）！",
+        answers: ["11"],
+        hint: "兩段刻字枕木之間，各自都剛好夾著 1 根素面空白的石枕木。",
+        story: "節奏完美！伴隨著哐當哐當的鐵道韻律，我們即將抵達高架去程的最南端！"
+      },
+      {
+        id: 9,
+        zone: "區域 F-2｜民生鐵橋折返點",
+        route: "【南端折返點】抵達高架步道最南端「民生鐵橋」休憩平台。",
+        stars: "★★☆",
+        title: "第 9 題｜跨越四川的民生之路",
+        location: "民生鐵橋休憩平台解說牌",
+        desc: "閱讀解說牌文字：「民生路」是一條串接臺中盆地內四條溪流的重要道路，同時也是早期縱貫鐵路的「第＿＿座鐵橋」。\n\n請找出這四條溪流中名字帶有「顏色」的那條溪（填第一個字），加上鐵橋的序數（阿拉伯數字），組成「一字＋一數字」的答案！",
+        answers: ["綠2"],
+        hint: "四條溪流為綠川、柳川、梅川、麻園頭溪；文中寫著縱貫鐵路之「第二座鐵橋」。",
+        story: "解鎖成功！接下來請「走下樓梯至民生路地面層」，準備展開回程尋寶！"
+      },
+      {
+        id: 10,
+        zone: "區域 F-2｜民生綠橋地面層",
+        route: "【折返轉入地面層】下樓梯至民生路地面層，尋找高架橋旁的洗石子舊橋墩。",
+        stars: "★★☆",
+        title: "第 10 題｜橋墩下的歷史刻痕",
+        location: "民生路地面層・洗石子舊橋墩石碑",
+        desc: "在民生路旁尋找這座充滿歲月痕跡的洗石子舊橋墩。橋墩側面鑲嵌著一塊長方形石碑，上面直書刻著四個字——請注意！它跟剛剛樓上解說牌寫的「民生鐵橋」差了一個字！\n\n請問：這塊洗石子橋墩上刻的第三個字是什麼？這個字總共有幾畫？（請輸入：字，畫數，例如：橋，16）",
+        answers: ["綠，14", "綠,14", "綠14", "14"],
+        hint: "石碑上刻的是「民生綠橋」，第三個字「綠」部首糸 6 畫＋右半 8 畫，共 14 畫。",
+        story: "眼力驚人！現在請沿著「地面層水岸步道一路往北」走回火車站方向！"
+      },
+      {
+        id: 11,
+        zone: "區域 D｜飛天草坪橋下",
+        route: "【回程・地面層往北】沿地面層往北走至「飛天草坪多功能服務區」橋下空間。",
+        stars: "★★★",
+        title: "第 11 題｜神祕的官方拼字彩蛋",
+        location: "飛天草坪橋下空間解說牌",
+        desc: "設計師在製作導覽牌時，偶爾也會留下只有細心旅人才能發現的「時空裂縫」。請走到飛天草坪橋下的解說牌前，檢查橘色地圖最上方「臺中車站」正下方的英文拼字——你會發現這塊牌子少了一個英文字母！\n\n請問：被遺漏的那個英文字母，在 26 個英文字母中排第幾位？（A=1, B=2...）",
+        answers: ["20", "T", "t"],
+        hint: "正確拼法為 TAICHUNG STATION，但橋下這塊牌子印成了 TAICHUNG STAION，少了 T（第 20 個字母）。",
+        story: "太神啦！連官方印刷廠都沒發現的拼字彩蛋都被你揪出來了！"
+      },
+      {
+        id: 12,
+        zone: "區域 D｜飛天草坪橋下",
+        route: "【回程・地面層往北】轉身面向飛天草坪服務區的清水模石籠牆面。",
+        stars: "★★☆",
+        title: "第 12 題｜石籠牆裡的垂直暗號",
+        location: "飛天草坪服務區・清水模石籠牆",
+        desc: "找到這面結合清水模與鐵網石籠的特色牆面。石籠裡鑲嵌著兩行直立的綠色立體字，左側寫著土地的名字（A 個字母），右側寫著跨越百年的英文單字（B 個字母，不含數字 1908）。\n\n請計算 A × B 的結果！",
+        answers: ["60"],
+        hint: "左側為 TAIWAN（6 個字母），右側為 CONNECTION（10 個字母），6 × 10 = 60。",
+        story: "計算精準！請繼續沿著地面步道往北推進，前往綠川歷史遺構！"
+      },
+      {
+        id: 13,
+        zone: "區域 C｜綠川橋檯遺構",
+        route: "【回程・地面層往北】抵達「綠川歷史橋檯遺構」透明玻璃展示櫃前。",
+        stars: "★★☆",
+        title: "第 13 題｜百年磚牆上的新詩密碼",
+        location: "綠川歷史橋檯遺構・玻璃櫥窗《追憶，百代》",
+        desc: "隔著玻璃凝視地底百年的磚石遺構，玻璃上印著新詩《追憶，百代》。請仔細閱讀這首詩的前兩段（左半部與中間部），找出下列關鍵字各自出現在「第幾行」（由上往下算，不含標題）：\n\n1. 「轟鳴」出現在第幾行？\n2. 「波光」出現在第幾行？\n3. 「紅褐」出現在第幾行？\n\n請將這三個行數依序組合成三位數密碼！",
+        answers: ["356"],
+        hint: "「駐留在每一次穿梭時的轟鳴」是第 3 行；「波光」在第 5 行；「紅褐」在第 6 行。",
+        story: "詩意與歷史完美交會！這座 1906 年興建的紅磚橋檯，見證了老臺中的水岸榮光。"
+      },
+      {
+        id: 14,
+        zone: "區域 C｜綠川橋檯遺構",
+        route: "【回程・地面層往北】繞到玻璃展示櫃側面的三角形斜面玻璃牆。",
+        stars: "★★☆",
+        title: "第 14 題｜古人堆石頭的智慧",
+        location: "綠川歷史橋檯遺構・工法說明玻璃牆",
+        desc: "閱讀玻璃牆上的解說文字：此遺構採用的工法為古代常用的「＿＿石砌（＿＿石）工法」，且工匠刻意將砌石設計為向後倒階梯的懸挑，目的是為了減小牆向土壓及抵抗「＿＿矩」。\n\n請問：括號內「（＿＿石）」與「抵抗＿＿矩」這兩個空格填入的中文字，合起來共計有幾個字？（請填數字）",
+        answers: ["5", "間知石力矩"],
+        hint: "括號內為「間知石」（3 個字），抵抗的是「力矩」（2 個字），3 + 2 = 5。",
+        story: "建築工藝解鎖！只剩最後兩道終極關卡，我們即將回到臺中火車站！"
+      },
+      {
+        id: 15,
+        zone: "區域 B｜時空之門年輪牆",
+        route: "【終點站・回到車站旁】抵達靠近臺中火車站的「時空之門」耐候鋼歷史牆。",
+        stars: "★★★",
+        title: "第 15 題｜牆面上的雙胞胎謎團",
+        location: "時空之門・耐候鋼歷史年輪牆",
+        desc: "細心偵探才會發現的雙胞胎彩蛋！這面牆上竟然出現了兩個同樣標註著「1913 臺中州廳」的圓形圖騰：\n\n• 大圓窗版（建築立面輪廓）：它的左邊鄰居是「＿＿廠」\n• 小圓窗版（同心圓十字標誌）：它的左邊鄰居則是「＿＿＿站」\n\n請依序寫出這兩個左邊鄰居的地標全名（中間用頓號隔開）！",
+        answers: ["帝國製糖廠、臺中火車站", "帝國製糖廠,臺中火車站", "帝國製糖廠 臺中火車站", "帝國製糖廠臺中火車站", "帝國製糖廠、台中火車站"],
+        hint: "大圓窗左邊露出「糖廠」二字（帝國製糖廠）；小圓窗左邊露出「車站」二字（臺中火車站）。",
+        story: "太厲害了！整面牆最隱密的空間排列彩蛋也被你破解！"
+      },
+      {
+        id: 16,
+        zone: "區域 B｜時空之門年輪牆",
+        route: "【終點站・最終寶箱】站在時空之門歷史牆前，解開最後一道時空總鎖！",
+        stars: "★★★",
+        title: "第 16 題｜穿越三十載的純漢字密碼",
+        location: "時空之門・耐候鋼歷史牆全景",
+        desc: "在整面牆所有圓形圖騰中，唯一沒有任何建築物、也沒有英文字母、純粹以「單一漢字」作為圓窗核心圖案的是哪兩座地標？（提示：一座與宗族姓氏有關，一座與武術演練有關）\n\n請將這兩座地標的「落成西元年份相加」，得到的四位數就是開啟最終寶箱、平安返回臺中火車站的通關總密碼！",
+        answers: ["3867"],
+        hint: "純漢字圓徽為「1930 林氏宗祠」（壽字紋）與「1937 道禾六藝文化館」（武字），1930 + 1937 = 3867。",
+        story: "恭喜通關！百年時光之門為你敞開，你已圓滿完成臺中綠空鐵道環狀大冒險！"
+      }
+    ];
+
+    let currentIdx = 0;
+    let solvedSet = new Set(JSON.parse(localStorage.getItem("greenway_solved") || "[]"));
+    let startTime = parseInt(localStorage.getItem("greenway_start") || Date.now());
+    localStorage.setItem("greenway_start", startTime);
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const mins = String(Math.floor(elapsed / 60)).padStart(2, "0");
+      const secs = String(elapsed % 60).padStart(2, "0");
+      document.getElementById("timer").textContent = `${mins}:${secs}`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    function renderNav() {
+      const nav = document.getElementById("stage-nav");
+      nav.innerHTML = "";
+      stages.forEach((s, idx) => {
+        const dot = document.createElement("div");
+        dot.className = "stage-dot";
+        if (idx === currentIdx) dot.classList.add("active");
+        if (solvedSet.has(s.id)) dot.classList.add("solved");
+        dot.textContent = s.id;
+        dot.onclick = () => {
+          currentIdx = idx;
+          renderStage();
+        };
+        nav.appendChild(dot);
+      });
+
+      const pct = Math.round((solvedSet.size / stages.length) * 100);
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+      document.getElementById("progress-label").textContent = `完成進度：${solvedSet.size} / ${stages.length} 關`;
+    }
+
+    function renderStage() {
+      if (solvedSet.size === stages.length && currentIdx === stages.length) {
+        showVictory();
+        return;
+      }
+      document.getElementById("victory-screen").style.display = "none";
+      document.getElementById("quiz-card").style.display = "block";
+
+      const s = stages[currentIdx];
+      document.getElementById("zone-label").textContent = s.zone;
+      document.getElementById("route-text").textContent = s.route;
+      document.getElementById("q-num").textContent = `STAGE ${String(s.id).padStart(2, "0")} / ${stages.length}`;
+      document.getElementById("q-stars").textContent = `難度：${s.stars}`;
+      document.getElementById("q-title").textContent = s.title;
+      document.getElementById("q-location").innerHTML = `<span>📌 現地線索點：</span>${s.location}`;
+      document.getElementById("q-desc").textContent = s.desc;
+      document.getElementById("hint-box").textContent = `💡 提示：${s.hint}`;
+      document.getElementById("hint-box").style.display = "none";
+
+      const input = document.getElementById("answer-input");
+      const fb = document.getElementById("feedback");
+
+      if (solvedSet.has(s.id)) {
+        input.value = s.answers[0];
+        fb.className = "feedback success";
+        fb.innerHTML = `✅ <strong>已解鎖：</strong>${s.story}`;
+        fb.style.display = "block";
+      } else {
+        input.value = "";
+        fb.style.display = "none";
+      }
+
+      document.getElementById("prev-btn").disabled = currentIdx === 0;
+      document.getElementById("next-btn").textContent =
+        currentIdx === stages.length - 1 ? "查看完賽車票 🎫" : "下一關 →";
+
+      renderNav();
+    }
+
+    function toggleHint() {
+      const box = document.getElementById("hint-box");
+      box.style.display = box.style.display === "block" ? "none" : "block";
+    }
+
+    function checkAnswer() {
+      const s = stages[currentIdx];
+      const raw = document.getElementById("answer-input").value.trim().toUpperCase().replace(/\s+/g, "");
+      const fb = document.getElementById("feedback");
+
+      if (!raw) {
+        fb.className = "feedback error";
+        fb.textContent = "⚠️ 請先輸入通關密碼再點擊解鎖！";
+        fb.style.display = "block";
+        return;
+      }
+
+      const isCorrect = s.answers.some(ans => ans.toUpperCase().replace(/\s+/g, "") === raw);
+
+      if (isCorrect) {
+        solvedSet.add(s.id);
+        localStorage.setItem("greenway_solved", JSON.stringify([...solvedSet]));
+        fb.className = "feedback success";
+        fb.innerHTML = `🎉 <strong>密碼正確！</strong>${s.story}`;
+        fb.style.display = "block";
+        renderNav();
+
+        if (solvedSet.size === stages.length) {
+          setTimeout(showVictory, 1200);
+        }
+      } else {
+        fb.className = "feedback error";
+        fb.textContent = "❌ 密碼不正確喔！再仔細觀察一下現場細節，或點上方提示看看。";
+        fb.style.display = "block";
+      }
+    }
+
+    function changeStage(delta) {
+      if (currentIdx + delta >= stages.length) {
+        if (solvedSet.size === stages.length) {
+          showVictory();
+        } else {
+          const firstUnsolved = stages.findIndex(st => !solvedSet.has(st.id));
+          alert(`還有關卡尚未解鎖喔！系統將自動為你跳轉至第 ${stages[firstUnsolved].id} 題。`);
+          currentIdx = firstUnsolved;
+          renderStage();
+        }
+        return;
+      }
+      currentIdx = Math.max(0, Math.min(stages.length - 1, currentIdx + delta));
+      renderStage();
+    }
+
+    function showVictory() {
+      document.getElementById("quiz-card").style.display = "none";
+      document.getElementById("victory-screen").style.display = "block";
+      document.getElementById("final-time").textContent = document.getElementById("timer").textContent;
+      document.getElementById("zone-label").textContent = "全線完賽達成！";
+    }
+
+    function resetGame() {
+      if (confirm("確定要清除所有闖關紀錄並重新計時嗎？")) {
+        localStorage.removeItem("greenway_solved");
+        localStorage.removeItem("greenway_start");
+        solvedSet.clear();
+        startTime = Date.now();
+        localStorage.setItem("greenway_start", startTime);
+        currentIdx = 0;
+        renderStage();
+      }
+    }
+
+    document.getElementById("answer-input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") checkAnswer();
+    });
+
+    renderStage();
+  </script>
+</body>
+</html>
